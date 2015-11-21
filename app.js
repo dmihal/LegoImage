@@ -18,5 +18,26 @@
     canvas.height = img.height;
     canvas.width  = img.width;
     ctx.drawImage(img, 0, 0);
+
+    mosaicize(20, 20);
   };
+
+  var mosaicize = function(h, w){
+    for (var blockX = 0; blockX < canvas.width; blockX += w) {
+      for (var blockY = 0; blockY < canvas.height; blockY += h) {
+        var myImageData = ctx.getImageData(blockX, blockY, w, h);
+        var totals = [0, 0, 0, 0]
+        for (var i = 0; i < myImageData.data.length; i++) {
+          totals[i % 4] += myImageData.data[i];
+        }
+        var numPixels = w * h;
+        var avg = totals.map(function(n){return Math.floor(n / numPixels)});
+        avg[3] /= 255;
+        var rgb = avg.join(',');
+
+        ctx.fillStyle = `rgba(${rgb})`;
+        ctx.fillRect(blockX, blockY, w, h);
+      };
+    };
+  }
 })();

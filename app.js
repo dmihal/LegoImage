@@ -1,4 +1,5 @@
 (function (argument) {
+  var COLORS;
   var fileSelector = document.querySelector('input');
   var canvas = document.querySelector('canvas');
   var ctx = canvas.getContext('2d');
@@ -10,7 +11,9 @@
     fileReader.addEventListener('loadend', function(e){
       var img = new Image();
       img.src = this.result;
-      processImage(img);
+      img.addEventListener('load', function(){
+        processImage(this);
+      });
     })
   });
 
@@ -35,9 +38,38 @@
         avg[3] /= 255;
         var rgb = avg.join(',');
 
-        ctx.fillStyle = `rgba(${rgb})`;
+        var closestColor = getClosestColor.apply(null, avg);
+
+        ctx.fillStyle = `rgb(${closestColor.r}, ${closestColor.g}, ${closestColor.b})`;
         ctx.fillRect(blockX, blockY, w, h);
       };
     };
-  }
+  };
+
+  var getClosestColor = function(r, g, b) {
+    var dist = 1000;
+    var closestColor;
+    for (var i = 0; i < COLORS.length; i++) {
+      var color = COLORS[i];
+      var distance = Math.sqrt(
+        Math.pow(r - color.r, 2) +
+        Math.pow(g - color.g, 2) +
+        Math.pow(b - color.b, 2)
+      );
+      if (distance < dist) {
+        dist = distance;
+        closestColor = color;
+      }
+    };
+    return closestColor
+  };
+
+  (function(filename){
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener('load', function(){
+      COLORS = JSON.parse(this.response);
+    });
+    xhr.open('GET', filename);
+    xhr.send();
+  })('colors.json');
 })();

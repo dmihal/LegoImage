@@ -1,6 +1,7 @@
 (function (argument) {
   var COLORS;
-  var fileSelector = document.querySelector('input');
+  var fileSelector = document.querySelector('#img');
+  var scaler = document.querySelector("#scale");
   var canvas = document.querySelector('canvas');
   var ctx = canvas.getContext('2d');
   var currentImg = null;
@@ -24,8 +25,10 @@
     canvas.width  = currentImg.width;
     ctx.drawImage(currentImg, 0, 0);
 
-    mosaicize(20, 20);
+    var scale = getScale();
+    mosaicize(6 * scale, 5 * scale);
   };
+  scaler.addEventListener('change', processImage)
 
   var mosaicize = function(h, w){
     for (var blockX = 0; blockX < canvas.width; blockX += w) {
@@ -46,6 +49,10 @@
         ctx.fillRect(blockX, blockY, w, h);
       };
     };
+  };
+
+  var getScale = function() {
+    return scaler.value;
   };
 
   Colors.importColors('legos.json');

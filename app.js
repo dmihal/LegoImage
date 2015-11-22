@@ -3,6 +3,7 @@
   var fileSelector = document.querySelector('input');
   var canvas = document.querySelector('canvas');
   var ctx = canvas.getContext('2d');
+  var currentImg = null;
 
   fileSelector.addEventListener('change', function(){
     var file = this.files[0];
@@ -12,15 +13,16 @@
       var img = new Image();
       img.src = this.result;
       img.addEventListener('load', function(){
-        processImage(this);
+        currentImg = this;
+        processImage();
       });
     })
   });
 
-  var processImage = function(img){
-    canvas.height = img.height;
-    canvas.width  = img.width;
-    ctx.drawImage(img, 0, 0);
+  var processImage = function(){
+    canvas.height = currentImg.height;
+    canvas.width  = currentImg.width;
+    ctx.drawImage(currentImg, 0, 0);
 
     mosaicize(20, 20);
   };
